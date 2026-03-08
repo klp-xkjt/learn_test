@@ -1,0 +1,35 @@
+//use std::io;
+
+fn main() {
+    println!("Hello, world!");
+    println!("Hello, Ferris!");
+    let mut input = String::new();
+    let str1 = "Here is your input: ";
+
+    io::stdin()
+        .read_line(&mut input)
+        .expect("No Input!");
+    println!("{str1} {input}")
+    let mut a = 1;
+    let b = 2;
+    let c = a + b;
+
+    let e = 0.1;
+    let f = 0.2;
+    let g1 = e + f;
+    let g2 = e - f;
+    let g3 = e * f;
+    let g4 = e / f;
+    let g5 = e % f;
+
+
+    a = a * 2 + 1;
+    {
+        let a = a - 1;
+        println!("{a}")
+    }
+    println!("{a}");
+
+    println!("{c}");
+    println!("{g1} {g2} {g3} {g4} {g5}");
+}

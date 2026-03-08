@@ -1,0 +1,45 @@
+// use std::io;
+
+#[derive(Debug, Clone)]
+struct UserInfo {
+    username: String,
+    active: bool,
+    email: String,
+    sign_in_count: u64
+}
+
+fn main() {
+    let user_email = String::from("example@example.com");
+    let mut user1: UserInfo = UserInfo {
+        username: String::from("Bob"),
+        active: true,
+        email: String::from("1@1.com"),
+        sign_in_count: 11111111111
+    };
+    user1.active = false;
+    user1.username = String::from("Alice");
+    if user_email != user1.email {
+        user1.email = user_email;
+    }
+    println!("{}, User 1st {}, email is {}.", user1.username, user1.sign_in_count, user1.email);
+
+    let user2: UserInfo = build_user(
+        String::from("Lil"),
+        String::from("2@2.com")
+    );
+    println!("{}, User 2st {}, email is {}.", user2.username, user2.sign_in_count, user2.email);
+
+    let user1_clone = user1.clone();
+    println!("{}, Clone: User 1st {}, email is {}.", user1.username, user1_clone.sign_in_count, user1_clone.email);
+    //println!("Trying to access old email: {}", user1.email); 
+    println!("Full user1 state: {user1:?}"); 
+}
+
+fn build_user(username: String, email: String) -> UserInfo {
+    UserInfo {
+        username,
+        active: true,
+        email,
+        sign_in_count: 99999999999
+    }
+}
