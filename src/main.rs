@@ -1,68 +1,63 @@
 #[derive(Debug)]
-struct Triangle {
-    side1: f64,
-    side2: f64,
-    side3: f64
+struct Cat {
+    name: String,
+    color: String,
+    meow: String,
+    age: u32,
+    is_alive: bool
 }
-struct Rectangle {
-    width: u32,
-    height: u32,
-}
-
-impl Rectangle {
-    fn area(&self) -> u32 {
-        self.width * self.height
+impl Cat {
+    fn new(name: &str, color: &str, age: u32) -> Self {
+        Cat {
+            name: name.to_string(),
+            color: color.to_string(),
+            meow: String::from("Meow~"),
+            age,
+            is_alive: true
+        }
+    }
+    fn say_meow(&self) {
+        println!("{}",self.meow);
+    }
+    fn judge_age(&self) -> String {
+        if self.age <= 1 {
+            String::from("This is a kitten.")
+        } else if self.age <= 7 {
+            String::from("This is an Adult cat.")
+        } else {
+            String::from("This is an old cat.")
+        }
+    }
+    fn about_cat(&self) {
+        if self.is_alive {
+            println!(
+                "This is a(n) {} named {}.It's {} now.", self.color, self.name, self.age
+            );
+        } else {
+            println!(
+                "This is a(n) {} named {}.Sadly, it's {} forever.", self.color, self.name, self.age
+            );
+        }
+    }
+    fn pass_away(&mut self) {
+        if self.is_alive {
+            self.is_alive = false;
+            println!("💔 {} has passed away...", self.name);
+        }
     }
 }
-impl Triangle {
-    fn area(&self) -> f64 {
-        let p: f64 = (self.side1 + self.side2 + self.side3) / 2.0;
-        let in_sqrt: f64 = p * (p - self.side1) * (p - self.side2) * (p - self.side3);
-        let result: f64 = in_sqrt.sqrt();
-        result
-    }
-    fn is_tri(&self) -> bool {
-        self.side1 + self.side2 > self.side3 && self.side2 + self.side3 > self.side1 && self.side1 + self.side3 > self.side2
-    }
-}
-
 fn main() {
-    let rect1 = Rectangle {
-        width: 30,
-        height: 50,
-    };
-
-    println!(
-        "The area of the rectangle is {} square pixels.",
-        rect1.area()
+    let mut my_cat_1: Cat = Cat::new(
+        "Gig",
+        "Yellow",
+        10
     );
+    let age_word: String = my_cat_1.judge_age();
+    my_cat_1.say_meow();
+    println!("{}", age_word); 
+    my_cat_1.about_cat();
 
-    let tri1: Triangle = Triangle {
-        side1: 3.0,
-        side2: 4.0,
-        side3: 5.0
-    };
-    if tri1.is_tri() {
-        println!(
-            "The area of the triangle is {}.",
-            tri1.area()
-        );
-    } else {
-        println!("Please check your triangle")
-    }
-
-    let tri2: Triangle = Triangle {
-        side1: 9.0,
-        side2: 4.0,
-        side3: 3.0
-    };
-    if tri2.is_tri() {
-        println!(
-            "The area of the triangle is {}.",
-            tri2.area()
-        );
-    } else {
-        println!("Please check your triangle.");
-        println!("Invalid triangle detected: {:?}", tri2);
-    }
+    my_cat_1.pass_away();
+    my_cat_1.about_cat();
+    println!("{my_cat_1:?}")
 }
