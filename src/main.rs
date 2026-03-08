@@ -1,10 +1,21 @@
+#[derive(Debug, Clone)] 
+enum LifeStatus {
+    Alive,
+    Dead
+}
+enum AgeStage {
+    Kitten,   // <= 1
+    Adult,    // 2 - 7
+    Senior,   // > 7
+}
+
 #[derive(Debug)]
 struct Cat {
     name: String,
     color: String,
     meow: String,
     age: u32,
-    is_alive: bool
+    status: LifeStatus
 }
 impl Cat {
     fn new(name: &str, color: &str, age: u32) -> Self {
@@ -13,23 +24,31 @@ impl Cat {
             color: color.to_string(),
             meow: String::from("Meow~"),
             age,
-            is_alive: true
+            status: LifeStatus::Alive
         }
     }
     fn say_meow(&self) {
-        println!("{}",self.meow);
+        match self.status {
+            LifeStatus::Alive => println!("{}", self.meow),
+            LifeStatus::Dead => println!("💤 {} is sleeping forever...", self.name)
+        }
     }
-    fn judge_age(&self) -> String {
-        if self.age <= 1 {
-            String::from("This is a kitten.")
-        } else if self.age <= 7 {
-            String::from("This is an Adult cat.")
-        } else {
-            String::from("This is an old cat.")
+    fn judge_age(&self) -> AgeStage {
+        match self.age {
+            0..=1 => AgeStage::Kitten,
+            2..=7 => AgeStage::Adult,
+            _ => AgeStage::Senior
+        }
+    }
+    fn age_description(&self) -> &str {
+        match self.judge_age() {
+            AgeStage::Kitten => "This is a kitten.",
+            AgeStage::Adult => "This is an adult.",
+            _ => "This is an old cat"
         }
     }
     fn about_cat(&self) {
-        if self.is_alive {
+        if let LifeStatus::Alive = self.status {
             println!(
                 "This is a(n) {} named {}.It's {} now.", self.color, self.name, self.age
             );
@@ -40,24 +59,26 @@ impl Cat {
         }
     }
     fn pass_away(&mut self) {
-        if self.is_alive {
-            self.is_alive = false;
+        if let LifeStatus::Alive = self.status {
             println!("💔 {} has passed away...", self.name);
+            self.status = LifeStatus::Dead;
+        } else {
+            println!("⚠️ {} is already gone.", self.name);
         }
     }
 }
 fn main() {
-    let mut my_cat_1: Cat = Cat::new(
-        "Gig",
-        "Yellow",
-        10
-    );
-    let age_word: String = my_cat_1.judge_age();
+    let mut my_cat_1 = Cat::new("Gig", "Yellow", 10);
+    
     my_cat_1.say_meow();
-    println!("{}", age_word); 
+    println!("{} is a {}", my_cat_1.name, my_cat_1.age_description());
     my_cat_1.about_cat();
 
     my_cat_1.pass_away();
+    my_cat_1.say_meow();
     my_cat_1.about_cat();
-    println!("{my_cat_1:?}")
+    
+    my_cat_1.pass_away(); 
+
+    println!("{my_cat_1:?}");
 }
