@@ -1,84 +1,47 @@
-#[derive(Debug, Clone)] 
-enum LifeStatus {
-    Alive,
-    Dead
-}
-enum AgeStage {
-    Kitten,   // <= 1
-    Adult,    // 2 - 7
-    Senior,   // > 7
-}
-
 #[derive(Debug)]
-struct Cat {
-    name: String,
-    color: String,
-    meow: String,
-    age: u32,
-    status: LifeStatus
+enum Infos {
+    Name(String),
+    Age(u32),
+    Height(f32)
 }
-impl Cat {
-    fn new(name: &str, color: &str, age: u32) -> Self {
-        Cat {
-            name: name.to_string(),
-            color: color.to_string(),
-            meow: String::from("Meow~"),
-            age,
-            status: LifeStatus::Alive
-        }
-    }
-    fn say_meow(&self) {
-        match self.status {
-            LifeStatus::Alive => println!("{}", self.meow),
-            LifeStatus::Dead => println!("💤 {} is sleeping forever...", self.name)
-        }
-    }
-    fn judge_age(&self) -> AgeStage {
-        match self.age {
-            0..=1 => AgeStage::Kitten,
-            2..=7 => AgeStage::Adult,
-            _ => AgeStage::Senior
-        }
-    }
-    fn age_description(&self) -> &str {
-        match self.judge_age() {
-            AgeStage::Kitten => "This is a kitten.",
-            AgeStage::Adult => "This is an adult.",
-            _ => "This is an old cat"
-        }
-    }
-    fn about_cat(&self) {
-        if let LifeStatus::Alive = self.status {
-            println!(
-                "This is a(n) {} named {}.It's {} now.", self.color, self.name, self.age
-            );
-        } else {
-            println!(
-                "This is a(n) {} named {}.Sadly, it's {} forever.", self.color, self.name, self.age
-            );
-        }
-    }
-    fn pass_away(&mut self) {
-        if let LifeStatus::Alive = self.status {
-            println!("💔 {} has passed away...", self.name);
-            self.status = LifeStatus::Dead;
-        } else {
-            println!("⚠️ {} is already gone.", self.name);
-        }
-    }
-}
+
 fn main() {
-    let mut my_cat_1 = Cat::new("Gig", "Yellow", 10);
-    
-    my_cat_1.say_meow();
-    println!("{} is a {}", my_cat_1.name, my_cat_1.age_description());
-    my_cat_1.about_cat();
+ // let v1: Vec<i32> = Vec::new();
+ /* let v2: Vec<i32> = vec![0, 1, 2];
+       v2.push(3); */
 
-    my_cat_1.pass_away();
-    my_cat_1.say_meow();
-    my_cat_1.about_cat();
-    
-    my_cat_1.pass_away(); 
+    let mut v2: Vec<i32> = vec![0, 1, 2];
+    v2.push(3);
 
-    println!("{my_cat_1:?}");
+    let mut v3: Vec<i32> = vec![60, 11, 24];
+    v3.push(21);
+    v3.push(43);
+
+    let vec3_first: &i32 = &v3[0];
+    println!("First of v3: {}", vec3_first);
+
+    let vec2_third: Option<&i32> = v2.get(2);
+    match vec2_third {
+        Some(a) => println!("Third of v2: {}", a),
+        None => ()
+    }
+
+    for i in &v3 {
+        println!("{}", i);
+    }
+
+    let info_a = vec![
+        Infos::Name(String::from("Alice")),
+        Infos::Age(23),
+        Infos::Height(169.8)
+    ];
+    for i in &info_a {
+        match i {
+            Infos::Name(i) => println!("Name: {}", i),
+            Infos::Age(i) => println!("Age: {}", i),
+            Infos::Height(i) => println!("Height: {}", i)
+        }
+    }
+    println!("{info_a:?}");
+    
 }
