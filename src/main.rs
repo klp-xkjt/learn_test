@@ -1,31 +1,17 @@
-use std::io;
-//use std::collections::HashMap;
 fn main() {
-    let mut words: String = String::new();
-    io::stdin().read_line(&mut words).expect("Please Input");
-    let clean_word = words.trim().to_string(); 
-
-    if clean_word.is_empty() {
-        println!("请输入一个单词！");
-        return;
-    }
-
-    let pig_latin = to_pig_latin(clean_word);
-    println!("{pig_latin}");
+    let a: usize = 10;
+    let list: [i32; 4] = [0, 1, 2, 3];
+    let list_first: i32 = match safe_get(&list, a) {
+        Ok(re) => re,
+        Err(error) => panic!("{error:?}")
+    };
+    println!("{list_first}");
 }
 
-fn to_pig_latin(word: String) -> String {
-    if word.is_empty() {
-        return String::new();
-    }
-    let first_letter: char = word.chars().next().unwrap();
-    match first_letter {
-        'a' | 'o' | 'e' | 'i' | 'u' => {
-            return format!("{}hay", word);
-        },
-        _ => {
-            let other_letters = word.chars().skip(1).collect::<String>();
-            return format!("{}{}ay", other_letters, first_letter);
-        }
+fn safe_get(list: &[i32], index: usize) -> Result<i32, String> {
+    if index < list.len() {
+        Ok(list[index])
+    } else {
+        Err(format!("索引 {} 越界了！数组长度只有 {}", index, list.len()))
     }
 }
