@@ -1,47 +1,27 @@
-#[derive(Debug)]
-enum Infos {
-    Name(String),
-    Age(u32),
-    Height(f32)
-}
+use std::collections::HashMap;
+use std::io;
 
 fn main() {
- // let v1: Vec<i32> = Vec::new();
- /* let v2: Vec<i32> = vec![0, 1, 2];
-       v2.push(3); */
+    let mut registry: HashMap<String, u32> = HashMap::new();
+    registry.insert(String::from("Gig"), 123456789);
+    println!("{registry:?}");
 
-    let mut v2: Vec<i32> = vec![0, 1, 2];
-    v2.push(3);
+    let mut k_input: String = String::new();
+    let mut v_input: String = String::new();
+    println!("Name: ");
+    io::stdin().read_line(&mut k_input).expect("Failed to read name");
+    println!("Telephone: ");
+    io::stdin().read_line(&mut v_input).expect("Failed to read telephone");
 
-    let mut v3: Vec<i32> = vec![60, 11, 24];
-    v3.push(21);
-    v3.push(43);
-
-    let vec3_first: &i32 = &v3[0];
-    println!("First of v3: {}", vec3_first);
-
-    let vec2_third: Option<&i32> = v2.get(2);
-    match vec2_third {
-        Some(a) => println!("Third of v2: {}", a),
-        None => ()
-    }
-
-    for i in &v3 {
-        println!("{}", i);
-    }
-
-    let info_a = vec![
-        Infos::Name(String::from("Alice")),
-        Infos::Age(23),
-        Infos::Height(169.8)
-    ];
-    for i in &info_a {
-        match i {
-            Infos::Name(i) => println!("Name: {}", i),
-            Infos::Age(i) => println!("Age: {}", i),
-            Infos::Height(i) => println!("Height: {}", i)
+    let key = k_input.trim().to_string(); 
+    let value: u32 = match v_input.trim().parse() {
+        Ok(num) => num,
+        Err(_) => {
+            println!("错误：请输入有效的数字！");
+            return;
         }
-    }
-    println!("{info_a:?}");
-    
+    };
+
+    registry.insert(key, value);
+    println!("{registry:?}");
 }
