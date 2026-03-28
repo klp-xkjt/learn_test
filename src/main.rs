@@ -7,6 +7,7 @@ enum Genders {
     Female,
     Others(String)
 }
+
 #[derive(Debug, Clone, PartialEq)]
 enum EduBackground {
     Primary,
@@ -26,19 +27,20 @@ struct Worker {
 }
 
 impl Worker {
-    fn new_a_worker(name: String, gender: Genders, edu: EduBackground, date: String) -> Self {
+    fn new_a_worker(name: String, gender: Genders, edu: EduBackground, date: String) -> Result<Self, String> {
         if Self::worker_test(&edu) {
-            Worker {
+            Ok(Worker {
                 name,
                 gender,
                 edu,
                 date_of_induction: date,
                 is_working: true
-            }
+            })
         } else {
-            panic!("Not up to standard, the educational background must be above Junior.");
+            Err(format!("The worker is not enough to new because of educational background."))
         }
     }
+
     fn worker_test(edu: &EduBackground) -> bool {
         match edu {
             EduBackground::Primary | EduBackground::Junior => false,
@@ -54,169 +56,163 @@ impl Worker {
 fn main() {
     let mut company_staff: HashMap<String, Worker> = HashMap::new();
 
-    let w1: Worker = Worker::new_a_worker(
+    let w1: Result<Worker, String> = Worker::new_a_worker(
         "Alice".to_string(),
         Genders::Female,
         EduBackground::University,
         "2023-01-15".to_string(),
     );
-    company_staff.insert(w1.name.clone(), w1);
+    
+    match w1 {
+        Ok(worker) => {
+            company_staff.insert(worker.name.clone(), worker);
+            println!("Alice initialized successfully.");
+        }
+        Err(e) => println!("{}", e)
+    }
 
     loop {
         let mut input: String = String::new();
-
-        println!("Here is a worker management.What do you want to do?");
+        
+        println!("\n--- Worker Management System ---");
         println!("1. Show the number of workers.");
         println!("2. New a worker.");
         println!("3. Show information of workers"); 
         println!("4. Resign a worker.");
-        println!("No. Exit it.");
-        /*
-            1.Show the number of workers.
-            2.New a worker.
-            No.Exit it.
-        */
-        io::stdin().read_line(&mut input).expect("Error");
+        println!("No. Exit program.");
+        println!("Please input your choice:");
+
+        io::stdin().read_line(&mut input).expect("Error reading input");
 
         match input.trim() {
             "1" => {
-                let worker_number = company_staff.len();
-                println!("Number: {}", worker_number);
-                println!("---------------------");
-            },
+                println!("Number of workers: {}", company_staff.len());
+            }
             "2" => {
-                let new_worker: Option<Worker> = create_input();
-                if let Some(worker) = new_worker {
-                    company_staff.insert(worker.name.clone(), worker);
-                }
-            },
-            "3" => {
-                println!("All Workers Information List");
-                if company_staff.is_empty() {
-                    println!("There's no workers yet.");
-                    println!("---------------------");
-                }
-
-                for (k, v) in company_staff.iter() {
-                    let info: String = get_worker_info(v);
-                    print!("{} ", k);
-                    println!("{}", info);
-                    println!("---------------------");
-                }
-            },
-            "4" => {
-                let mut all_names: String = String::new();
-
-                for (k, _) in company_staff.iter() {
-                    all_names.push_str(k);
-                    all_names.push(' ');
-                }
-                if all_names.is_empty() {
-                    println!("No workers to resign.");
-                } else {
-                    println!("Current workers: {}", all_names);
-                    println!("Which worker do you want to resign? (Enter name): ");
-
-                    let mut resign_worker_input: String = String::new();
-                    io::stdin().read_line(&mut resign_worker_input).expect("Error");
-                    let resign_name: String = resign_worker_input.trim().to_string();
-
-                    match company_staff.get_mut(&resign_name) {
-                        Some(worker) => {
-                            if worker.is_working {
-                                worker.resign();
-                                println!("{} has been resigned successfully.", worker.name);
-                            } else {
-                                println!("{} has already resigned.", worker.name);
-                            }
-                        },
-                        None => {
-                            println!("Error: Worker '{}' not found.", resign_name);
-                        }
+                match create_input() {
+                    Ok(new_worker) => {
+                        company_staff.insert(new_worker.name.clone(), new_worker);
+                        println!("Worker added successfully!");
+                    }
+                    Err(e) => {
+                        println!("Failed to create worker: {}", e);
                     }
                 }
-            },
+            }
+            "3" => {
+                if company_staff.is_empty() {
+                    println!("No workers in the system.");
+                } else {
+                    println!("All Workers Information List:");
+                    for (name, worker) in &company_staff {
+                        println!("{}: {}", name, get_worker_info(worker));
+                    }
+                }
+            }
+            "4" => {
+                if company_staff.is_empty() {
+                    println!("No workers to resign.");
+                    continue;
+                }
+
+                println!("Current workers: {:?}", company_staff.keys());
+                let mut resign_name: String = String::new();
+                println!("Which worker do you want to resign? (Enter name): ");
+                io::stdin().read_line(&mut resign_name).expect("Error");
+
+                let resign_name: &str = resign_name.trim();
+                if let Some(worker) = company_staff.get_mut(resign_name) {
+                    if worker.is_working {
+                        worker.resign();
+                        println!("{} has resigned successfully.", worker.name);
+                    } else {
+                        println!("{} has already resigned.", worker.name);
+                    }
+                } else {
+                    println!("Error: Worker '{}' not found.", resign_name);
+                }
+            }
             "No" => {
-                println!("You exit the program.");
-                println!("---------------------");
+                println!("Exiting the program. Goodbye!");
                 break;
-            },
+            }
             _ => {
-                println!("Sorry, try to input others");
-                println!("---------------------");
+                println!("Invalid input. Please try again.");
             }
         }
+        println!("---------------------");
     }
 }
 
 fn get_worker_info(worker: &Worker) -> String {
-    let gender: String = match &worker.gender {
-        Genders::Male => "Male".to_string(),
-        Genders::Female => "Female".to_string(),
-        Genders::Others(a) => a.to_string()
+    let gender: &str = match &worker.gender {
+        Genders::Male => "Male",
+        Genders::Female => "Female",
+        Genders::Others(a) => a.as_str(),
     };
-    let edu: String = match &worker.edu {
-        EduBackground::Senior => "Senior".to_string(),
-        EduBackground::University => "University".to_string(),
-        EduBackground::Higher => "Higher level".to_string(),
-        _ => "Others".to_string()
+    
+    let edu: &str = match &worker.edu {
+        EduBackground::Senior => "Senior",
+        EduBackground::University => "University",
+        EduBackground::Higher => "Higher level",
+        EduBackground::Primary => "Primary",
+        EduBackground::Junior => "Junior",
     };
-    let status: String = if worker.is_working {
-        "On Duty".to_string()
-    } else {
-        "Resigned".to_string()
-    };
+    
+    let status: &str = if worker.is_working { "On Duty" } else { "Resigned" };
 
-    format!("Name: {}, Gender: {}, Educational background: {}, Induction date: {},Status: {}.", worker.name, gender, edu, worker.date_of_induction, status)
+    format!(
+        "Gender: {}, Education: {}, Induction: {}, Status: {}",
+        gender, edu, worker.date_of_induction, status
+    )
 }
 
-fn create_input() -> Option<Worker> {
+fn create_input() -> Result<Worker, String> {
     let mut name_input: String = String::new();
-    println!("Name: ");
-    io::stdin().read_line(&mut name_input).expect("Error");
+    println!("Enter name: ");
+    io::stdin().read_line(&mut name_input).map_err(|_| "IO Error")?;
     let name: String = name_input.trim().to_string();
+    
     if name.is_empty() {
-        println!("Please input a name.");
-        return None;
+        return Err("Name cannot be empty".to_string());
     }
 
     let mut gender_input: String = String::new();
     println!("Gender: Male/Female/Others");
-    io::stdin().read_line(&mut gender_input).expect("Error");
-    let gender = match gender_input.trim() {
+    io::stdin().read_line(&mut gender_input).map_err(|_| "IO Error")?;
+    let gender: Genders = match gender_input.trim() {
         "Male" => Genders::Male,
         "Female" => Genders::Female,
         "Others" => {
             let mut other_desc: String = String::new();
-            println!("Your gender: ");
-            io::stdin().read_line(&mut other_desc).expect("Error");
+            println!("Your gender description: ");
+            io::stdin().read_line(&mut other_desc).map_err(|_| "IO Error")?;
             Genders::Others(other_desc.trim().to_string())
-        },
+        }
         _ => {
-            println!("Invalid value.Gender is set to Male.");
+            println!("Invalid value. Gender is set to Male.");
             Genders::Male
         }
     };
 
     let mut edu_input: String = String::new();
     println!("Educational background: Primary/Junior/Senior/University/Higher");
-    io::stdin().read_line(&mut edu_input).expect("Error");
-    let edu = match edu_input.trim() {
+    io::stdin().read_line(&mut edu_input).map_err(|_| "IO Error")?;
+    let edu: EduBackground = match edu_input.trim() {
         "Primary" => EduBackground::Primary,
         "Junior" => EduBackground::Junior,
         "Senior" => EduBackground::Senior,
         "University" => EduBackground::University,
         "Higher" => EduBackground::Higher,
         _ => {
-            println!("Invalid value.Educational background is set to Senior.");
+            println!("Invalid value. Educational background is set to Senior.");
             EduBackground::Senior
         }
     };
 
     let mut date: String = String::new();
-    println!("The date of induction: ");
-    io::stdin().read_line(&mut date).expect("Error");
+    println!("Date of induction (YYYY-MM-DD): ");
+    io::stdin().read_line(&mut date).map_err(|_| "IO Error")?;
 
-    println!("Create workers successfully.");
-    Some(Worker::new_a_worker(name, gender, edu, date))
+    Worker::new_a_worker(name, gender, edu, date.trim().to_string())
 }
