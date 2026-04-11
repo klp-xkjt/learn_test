@@ -1,0 +1,26 @@
+//use std::io;
+
+fn main() {
+    println!("Hello World!");
+
+    let bool_true: bool = true;
+    let bool_false: bool = false;
+    let fruit_type = "Apples";
+
+    if fruit_type == "Apples" {
+        println!("Those are apples.");
+    } else if fruit_type == "Bananas" {
+        println!("Those are bananas.");
+    } else {
+        println!("Others.");
+    }
+
+    if bool_true {
+        println!("It's true.");
+    } else {
+        println!("It's false.");
+    }
+
+    let number_example = if bool_false { 344 } else {114};
+    println!("{}", number_example);
+}

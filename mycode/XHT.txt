@@ -1,0 +1,74 @@
+//use std::io;
+
+fn main() {
+    println!("Hello World!");
+    
+    /*let mut i: i32 = 0;
+    loop {
+        println!("Loop Text");
+        if i == 5 {
+            println!("Now Breaking!");
+            break;
+        }
+        i += 1;
+    }*/
+    /*let mut a: i32 = 0;
+    let result = loop {
+        a += 1;
+        if a == 10 {
+            break a * 3;
+        } 
+    };
+    println!("{result}")*/
+    /*let mut counts: i32 = 0;
+    'do_something: loop {
+        println!("{}", counts);
+        let mut n: i32 = 10;
+        loop {
+            println!("{}", n);
+            if n == 9 {
+                break;
+            }
+            if counts == 2 {
+                break 'do_something;
+            }
+            n -= 1;
+        }
+        counts += 1;
+    }*/
+    /*let mut i: i32 = 0;
+    while i != 10 {
+        println!("i = {}", i);
+        i += 1;
+        if i == 10 {
+            println!("Now i = {}, and enter the loop.", i);
+        }
+    }*/
+    /*let list_years: [i32; 5] = [2000, 2010, 2020, 2030, 2040];
+    let mut a: usize = 0;
+    while a != 5 {
+        println!("Year {}", list_years[a]);
+        a += 1;
+    }*/
+
+    let name_list: [&str; 4] = ["Ali", "Bob", "Kik", "Moa"];
+    for i in (0..=3).rev() {
+        println!("{}", name_list[i]);
+    }
+    for i in &name_list {
+        println!("Value: {}", i);
+    }
+    let temp_1: f32 = convert_temperature(37.5, 'F');
+    let temp_2: f32 = convert_temperature(100.4, 'C');
+    println!("{} {}", temp_1, temp_2);
+}
+
+fn convert_temperature(value: f32, to_unit: char) -> f32 {
+    if to_unit == 'C' {
+        (value - 32.0) * (5.0 / 9.0)
+    } else if to_unit == 'F' {
+        value * 9.0 / 5.0 + 32.0
+    } else {
+        0.0
+    }
+}

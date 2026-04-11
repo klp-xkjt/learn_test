@@ -1,123 +1,86 @@
-trait Shape {
-    fn area(&self) -> f32;
-    fn cf(&self) -> f32; // circumference
+struct Message<'a> {
+    p_name: &'a str,
+    text: &'a str,
+    r_name: &'a str
 }
-
-struct Triangle {
-    a: f32,
-    b: f32,
-    c: f32,
-}
-
-impl Shape for Triangle {
-    fn area(&self) -> f32 {
-        let p = (self.a + self.b + self.c) / 2.0;
-        let in_sqrt = p * (p - self.a) * (p - self.b) * (p - self.c);
-        in_sqrt.sqrt()
+impl<'a> Message<'a> {
+    fn output(&self) {
+        println!("{}: {}. To {}", self.p_name, self.text, self.r_name)
     }
-
-    fn cf(&self) -> f32 {
-        self.a + self.b + self.c
+    // 规则3
+    // fn who_sends(&self) -> &'a str {
+    //     self.p_name
+    // }
+    fn who_sends(&self) -> &str {
+        self.p_name
     }
-}
-
-// 平行四边形：底、侧边、夹角（弧度）
-struct Parallelogram {
-    base: f32,
-    side: f32,
-    angle: f32,
-}
-
-impl Shape for Parallelogram {
-    fn area(&self) -> f32 {
-        self.base * self.side * self.angle.sin()
+    fn who_receives(&self) -> &str {
+        self.r_name
     }
-
-    fn cf(&self) -> f32 {
-        2.0 * (self.base + self.side)
+    fn what_contexts(&self) -> &str {
+        self.text
     }
 }
 
-// 矩形：宽、高
-struct Rectangle {
-    width: f32,
-    height: f32,
-}
-
-impl Shape for Rectangle {
-    fn area(&self) -> f32 {
-        self.width * self.height
-    }
-
-    fn cf(&self) -> f32 {
-        2.0 * (self.width + self.height)
-    }
-}
-
-// 菱形：两条对角线
-struct Rhombus {
-    d1: f32,
-    d2: f32,
-}
-
-impl Shape for Rhombus {
-    fn area(&self) -> f32 {
-        0.5 * self.d1 * self.d2
-    }
-
-    fn cf(&self) -> f32 {
-        let side = ((self.d1 / 2.0).powi(2) + (self.d2 / 2.0).powi(2)).sqrt();
-        4.0 * side
-    }
-}
-
-// 正方形：边长
-struct Square {
-    side: f32,
-}
-
-impl Shape for Square {
-    fn area(&self) -> f32 {
-        self.side * self.side
-    }
-
-    fn cf(&self) -> f32 {
-        4.0 * self.side
-    }
-}
-
-// ------------------------------
-// 测试一下全部形状
-// ------------------------------
 fn main() {
-    let tri: Triangle = Triangle {
-        a: 3.0,
-        b: 4.0,
-        c: 5.0,
-    };
-    let para: Parallelogram = Parallelogram {
-        base: 4.0,
-        side: 3.0,
-        angle: std::f32::consts::PI / 2.0, // 90度，其实就是矩形
-    };
-    let rect: Rectangle = Rectangle {
-        width: 4.0,
-        height: 3.0,
-    };
-    let rhom: Rhombus = Rhombus {
-        d1: 6.0,
-        d2: 8.0,
-    };
-    let square: Square = Square { side: 4.0 };
+    let a: &str = "让我们看看如何通过传递拥有不同具体生命周期的引用来限制 longest 函数的使用。示例 10-22 是一个很直观的例子。";
+    {
+        let b: &str = "因为我们用相同的生命周期参数 'a 标注了返回的引用值，所以返回的引用值就能保证在 x 和 y 中较短的那个生命周期结束之前保持有效。";
+        min_str(a, b);
+    }
 
-    show_all(tri);
-    show_all(para);
-    show_all(rect);
-    show_all(rhom);
-    show_all(square);
+    let f1: &str = "Hello";
+    {
+        let f2: &str = "World";
+        let fp: &str = first_par(f1, f2);
+        println!("{fp}");
+    }
+    // println!("{fp}"); Avoid it.
+
+    let f_m: Message = Message {
+        p_name: "Alice",
+        text: "adfsdfdfdfasdafsdf",
+        r_name: "Bob"
+    };
+    println!("Publish: {}, context: {}, receiver: {}", f_m.who_sends(), f_m.what_contexts(), f_m.who_receives());
+    f_m.output();
+
+    let s_a: &'static str = "kdjfakjkjd";
+    {
+        println!("{s_a}");
+    }
+    println!("{s_a}");
 }
 
-fn show_all<T: Shape>(shape: T) {
-    println!("面积：{}", shape.area());
-    println!("周长：{}", shape.cf());
+// 规则1
+// fn min_str<'a>(a: &'a str, b: &'a str) {
+//     if a.is_empty() | b.is_empty() {
+//         println!("有一个或都是空的");
+//     }
+
+//     if a.len() < b.len() {
+//         println!("a 更少");
+//     } else if b.len() < a.len() {
+//         println!("b 更少");
+//     } else {
+//         println!("相等");
+//     }
+// }
+fn min_str(a: &str, b: &str) {
+    if a.is_empty() | b.is_empty() {
+        println!("有一个或都是空的");
+    }
+
+    if a.len() < b.len() {
+        println!("a 更少");
+    } else if b.len() < a.len() {
+        println!("b 更少");
+    } else {
+        println!("相等");
+    }
+}
+
+// 不可不写生命周期
+fn first_par<'a>(a: &'a str, _b: &'a str) -> &'a str {
+    a
 }

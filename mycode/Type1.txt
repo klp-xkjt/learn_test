@@ -1,0 +1,12 @@
+fn main() {
+    println!("Hello World!");
+    let tup: (&str, i32, &str) = ("Ferris", 2016, "red");
+    let (x, y, z) = tup;
+    println!("Mascot of Rust is {x}, starting in {y}, it's {z}.");
+
+    let a: [i32; 4] = [1, 2, 3, 4];
+    let b: [i32; 6] = [8; 6];
+    let list_first = a[3];
+    let list_second = b[5];
+    println!("{list_first} {list_second}");
+}

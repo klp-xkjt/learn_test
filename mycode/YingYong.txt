@@ -1,0 +1,34 @@
+fn main() {
+    let letter_list = String::from("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    let letter_list_len: usize = letter_list.len();
+
+    let a1: &str = &letter_list[0..=5]; // From A to F.
+    let a1_c: & str = &letter_list[..=5]; // a1 Omitted.
+    let a2: &str = &letter_list[3..7]; // From D to G.
+    let a3: &str = &letter_list[21..letter_list_len]; // From V to Z.
+    let a3_c: &str = &letter_list[21..]; // a3 Omitted.
+    let a4: &str = &letter_list[0..letter_list_len]; // From A to Z.
+    let a4_c: &str = &letter_list[..]; // a4 Omitted.
+
+    println!("{}", a1);
+    println!("{}", a1_c);
+    println!("{}", a2);
+    println!("{}", a3);
+    println!("{}", a3_c);
+    println!("{}", a4);
+    println!("{}", a4_c);
+
+    let word_f = String::from("Hello World.");
+    let f = first_word(&word_f);
+    println!("{}", f);
+}
+
+fn first_word(s: &str) -> &str {
+    let bytes: &[u8] = s.as_bytes();
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return &s[0..i];
+        }
+    }
+    &s[..]
+}
