@@ -1,86 +1,135 @@
-struct Message<'a> {
-    p_name: &'a str,
-    text: &'a str,
-    r_name: &'a str
+use std::fmt;
+
+
+trait CatEatable {
+    fn taste(&self) {}
 }
-impl<'a> Message<'a> {
-    fn output(&self) {
-        println!("{}: {}. To {}", self.p_name, self.text, self.r_name)
-    }
-    // 规则3
-    // fn who_sends(&self) -> &'a str {
-    //     self.p_name
-    // }
-    fn who_sends(&self) -> &str {
-        self.p_name
-    }
-    fn who_receives(&self) -> &str {
-        self.r_name
-    }
-    fn what_contexts(&self) -> &str {
-        self.text
+#[derive(Debug)]
+struct DriedFish {}
+impl CatEatable for DriedFish {
+    fn taste(&self) {
+        println!("Cat eats the dried fish.");
     }
 }
+
+#[derive(Debug)]
+struct Cat<'a, Eat> {
+    name: &'a str,
+    color: &'a str,
+    eat: &'a Eat,
+    mood: i32,
+    energy: u32
+}
+
+impl<'a, Eat> Cat<'a, Eat>
+where 
+    Eat: CatEatable,
+{
+    fn new(name: &'a str, color: &'a str, eat: &'a Eat) -> Option<Self> {
+        if name.is_empty() || color.is_empty() {
+            None
+        } else {
+            Some(Self {
+                name,
+                color,
+                eat,
+                mood: 50,
+                energy: 50
+            })
+        }
+    }
+    fn play_toy(&mut self) {
+        if self.mood == 100 {
+            println!("小猫心情很好，不需要玩玩具。🐱");
+        } else if self.energy <=10 {
+            println!("{} 没能量玩玩具！😿", self.name);
+        } else {
+            self.mood += 25;
+            self.energy -= 10;
+            println!("{} 开心地玩玩具！😺", self.name);
+            if self.mood > 100 {
+                self.mood = 100;
+            }
+        }
+    }
+    fn eat_food(&mut self, food: &'a Eat) {
+        if self.energy == 100 {
+            println!("小猫不饿，不需要吃东西。🐱")
+        } else if self.mood <= 10 {
+            println!("小猫心情不好，吃不下。😿")
+        } else {
+            println!("{}吃得很开心！😺", self.name);
+            food.taste();
+            self.energy += 10;
+            self.mood += 10;
+            if self.mood > 100 {
+                self.mood = 100;
+            }
+        }
+    }
+    fn time_pass(&mut self) {
+        println!("⏳ 一会儿过去了...🐱");
+        
+        if self.mood > 50 {
+            self.mood -= 20;
+        } else if self.mood > 20 {
+            self.mood -= 10;
+        } else {
+            self.mood -= 5;
+        }
+    
+        if self.mood < 0 {
+            self.mood = 0;
+        }
+    }
+}
+
+impl<'a, Eat> fmt::Display for Cat<'a, Eat>
+where
+    Eat: CatEatable + fmt::Debug,
+    {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(f, "小猫名字：{} | 颜色：{} | 心情：{} | 能量：{} | 爱吃：{:?}", self.name, self.color, self.mood, self.energy, self.eat)
+        }
+    }
 
 fn main() {
-    let a: &str = "让我们看看如何通过传递拥有不同具体生命周期的引用来限制 longest 函数的使用。示例 10-22 是一个很直观的例子。";
-    {
-        let b: &str = "因为我们用相同的生命周期参数 'a 标注了返回的引用值，所以返回的引用值就能保证在 x 和 y 中较短的那个生命周期结束之前保持有效。";
-        min_str(a, b);
+    let fish: DriedFish = DriedFish {};
+    let mut my_cat: Cat<'_, DriedFish> = Cat::new("Miao", "Yellow", &fish).unwrap();
+
+    println!("==== 小猫刚诞生 ====");
+    println!("{my_cat}"); 
+
+    println!("\n==== 小猫开始玩玩具 4 次 ====");
+    for _ in 0..4 {
+        my_cat.play_toy();
     }
+    println!("{my_cat}");
 
-    let f1: &str = "Hello";
-    {
-        let f2: &str = "World";
-        let fp: &str = first_par(f1, f2);
-        println!("{fp}");
+    println!("\n==== 小猫继续玩玩具 4 次 ====");
+    for _ in 0..4 {
+        my_cat.play_toy();
     }
-    // println!("{fp}"); Avoid it.
+    println!("{my_cat}");
 
-    let f_m: Message = Message {
-        p_name: "Alice",
-        text: "adfsdfdfdfasdafsdf",
-        r_name: "Bob"
-    };
-    println!("Publish: {}, context: {}, receiver: {}", f_m.who_sends(), f_m.what_contexts(), f_m.who_receives());
-    f_m.output();
-
-    let s_a: &'static str = "kdjfakjkjd";
-    {
-        println!("{s_a}");
+    println!("\n==== 小猫开始吃饭 5 次 ====");
+    for _ in 0..5 {
+        my_cat.eat_food(&fish);
     }
-    println!("{s_a}");
-}
+    println!("{my_cat}");
 
-// 规则1
-// fn min_str<'a>(a: &'a str, b: &'a str) {
-//     if a.is_empty() | b.is_empty() {
-//         println!("有一个或都是空的");
-//     }
+    println!("\n==== 最后玩一次玩具 ====");
+    my_cat.play_toy();
+    println!("{my_cat}");
 
-//     if a.len() < b.len() {
-//         println!("a 更少");
-//     } else if b.len() < a.len() {
-//         println!("b 更少");
-//     } else {
-//         println!("相等");
-//     }
-// }
-fn min_str(a: &str, b: &str) {
-    if a.is_empty() | b.is_empty() {
-        println!("有一个或都是空的");
+    println!("\n==== 时间流逝 ====");
+    for _ in 0..10 {
+        my_cat.time_pass();
     }
-
-    if a.len() < b.len() {
-        println!("a 更少");
-    } else if b.len() < a.len() {
-        println!("b 更少");
-    } else {
-        println!("相等");
+    my_cat.eat_food(&fish);
+    println!("{my_cat}");
+    for _ in 0..4 {
+        my_cat.play_toy();
     }
-}
-
-// 不可不写生命周期
-fn first_par<'a>(a: &'a str, _b: &'a str) -> &'a str {
-    a
+    println!("{my_cat}");
 }
