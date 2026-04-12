@@ -25,17 +25,23 @@ impl<'a, Eat> Cat<'a, Eat>
 where 
     Eat: CatEatable,
 {
-    fn new(name: &'a str, color: &'a str, eat: &'a Eat) -> Option<Self> {
+    fn new(name: &'a str, color: &'a str, eat: &'a Eat) -> Self {
         if name.is_empty() || color.is_empty() {
-            None
-        } else {
-            Some(Self {
+            Self {
                 name,
                 color,
                 eat,
                 mood: 50,
                 energy: 50
-            })
+            }
+        } else {
+            Self {
+                name,
+                color,
+                eat,
+                mood: 50,
+                energy: 50
+            }
         }
     }
     fn play_toy(&mut self) {
@@ -95,7 +101,7 @@ where
 
 fn main() {
     let fish: DriedFish = DriedFish {};
-    let mut my_cat: Cat<'_, DriedFish> = Cat::new("Miao", "Yellow", &fish).unwrap();
+    let mut my_cat: Cat<'_, DriedFish> = Cat::new("Miao", "Yellow", &fish);
 
     println!("==== 小猫刚诞生 ====");
     println!("{my_cat}"); 
